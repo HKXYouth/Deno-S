@@ -1,0 +1,58 @@
+1、导入依赖
+	compile 'com.squareup.retrofit2:retrofit:2.0.0-beta4'   	 
+	compile 'com.squareup.retrofit2:converter-gson:2.0.0-beta4'    	
+	compile 'com.squareup.retrofit2:adapter-rxjava:2.0.0-beta4'    	
+	compile 'io.reactivex:rxandroid:1.1.0'    	
+	compile 'io.reactivex:rxjava:1.1.0'    	
+	compile 'com.squareup.okhttp3:logging-interceptor:3.3.1'
+
+2、写Constant类，放数据的地址
+public class Constant{
+
+    public static final String URL = "http://112.124.22.238:8081/featured?p={\"page\":0}";
+
+    public static final String BASE_URL = "http://112.124.22.238:8081/";
+
+}
+3、创建http包，里面放interface
+public interface ApiService{
+
+    @GET("featured?p={\"page\":0}")
+    Observable<AllDate> getReponseString();
+}
+4、  public void getReponseString() {
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+                .addConverterFactory(GsonConverterFactory.create())
+                .baseUrl(Constant.BASE_URL).build();
+
+        ApiService apiService = retrofit.create(ApiService.class);
+
+        Observable<AllDate> observable = apiService.getReponseString();
+
+        observable.subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<AllDate>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onNext(AllDate allDate) {
+
+                    }
+
+                });
+    }
+
+-----------------
+subscribeOn ：耗时操作在哪个子线程里发送的
+observeOn：发生在主线程里
+addCallAdapterFactory(RxJavaCallAdapterFactory.create())：使Retrofit支持使用Rxjava！！！！！！！
